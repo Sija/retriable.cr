@@ -1,3 +1,9 @@
 require "../../retriable"
 
-include Retriable
+module Retriable
+  module KernelExtension
+    delegate :retry, to: Retriable
+  end
+end
+
+include Retriable::KernelExtension
