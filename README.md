@@ -54,7 +54,7 @@ Here are the available options, in some vague order of relevance to most common 
 
 | Option | Default | Definition |
 | ------ | ------- | ---------- |
-| **`max_attempts`** | nil | Number of attempts to make at running your code block (includes initial attempt). |
+| **`max_attempts`** | `nil` | Number of attempts to make at running your code block (includes initial attempt). |
 | **`on`** | `[Exception]` | Type of exceptions to retry. [Read more](#configuring-which-options-to-retry-with-on). |
 | **`on_retry`** | `nil` | `Proc` to call after each try is rescued. [Read more](#callbacks). |
 | **`base_interval`** | `0.5.seconds` | The initial interval between tries. |
@@ -63,6 +63,7 @@ Here are the available options, in some vague order of relevance to most common 
 | **`multiplier`** | `1.5` | Each successive interval grows by this factor. A multiplier of 1.5 means the next interval will be 1.5x the current interval. |
 | **`rand_factor`** | `0.5` | The percentage to randomize the next retry interval time. The next interval calculation is `randomized_interval = retry_interval * (random value in range [1 - randomization_factor, 1 + randomization_factor])` |
 | **`intervals`** | `nil` | Skip generated intervals and provide your own `Enumerable` of intervals in seconds. [Read more](#customizing-intervals). |
+| **`backoff`** | `true` | Whether backoff strategy should be used. |
 | **`random`** | `Random::DEFAULT` | Object inheriting from `Random`, which provides an interface for random values generation, using a pseudo random number generator (PRNG). |
 
 #### Configuring which options to retry with :on
