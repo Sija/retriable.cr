@@ -72,8 +72,10 @@ Here are the available options, in some vague order of relevance to most common 
 
 - An `Exception` class (retry every exception of this type, including subclasses)
 - An `Enumerable` of `Exception` classes (retry any exception of one of these types, including subclasses)
+- A single `Proc` (retries exceptions ONLY if return is truthy)
 - A `Hash` where the keys are `Exception` classes and the values are one of:
   - `nil` (retry every exception of the key's type, including subclasses)
+  - A single `Proc` (retries exceptions ONLY for non `nil` returns)
   - A single `Regexp` pattern (retries exceptions ONLY if their `message` matches the pattern)
   - An `Enumerable` of patterns (retries exceptions ONLY if their `message` matches at least one of the patterns)
 
@@ -112,6 +114,9 @@ You can also use a hash to specify that you only want to retry exceptions with c
 Retriable.retry(on: {
   ActiveRecord::RecordNotUnique => nil,
   ActiveRecord::RecordInvalid => [/Parent must exist/, /Username has already been taken/],
+  ActiveRecord::RecordNotFound => ->(ex : Exception, attempt : Int32, elapsed : Time::Span, interval : Time::Span) {
+    {User, Post}.includes?(ex.model.class)
+  },
   Mysql2::Error => /Duplicate entry/,
 }) do
   # code here...

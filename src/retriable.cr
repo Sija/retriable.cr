@@ -92,11 +92,21 @@ module Retriable
       rescue ex
         elapsed_time = Time.monotonic - start_time
 
+        case interval = intervals.next
+        when Iterator::Stop
+          intervals.rewind
+          interval = intervals.first
+        end
+
         case on
+        when Proc
+          raise ex unless on.call(ex, attempt, elapsed_time, interval)
         when Hash, NamedTuple
           ex_matches = on.any? do |klass, messages|
             next ex.class <= klass unless messages
             case messages
+            when Proc
+              ex.class <= klass && messages.call(ex, attempt, elapsed_time, interval)
             when Regex
               ex.class <= klass && messages.match(ex.message.to_s)
             when Enumerable
@@ -106,12 +116,6 @@ module Retriable
           raise ex unless ex_matches
         else
           raise ex unless on.any? &.>= ex.class
-        end
-
-        case interval = intervals.next
-        when Iterator::Stop
-          intervals.rewind
-          interval = intervals.first
         end
 
         raise ex if max_attempts && (attempt >= max_attempts)

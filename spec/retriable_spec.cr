@@ -263,12 +263,49 @@ describe Retriable do
     end
 
     it "works with a hash exception where the value is an exception message pattern" do
+      tries = 0
       ex = expect_raises TestError do
         subject.retry(**nosleep_opts.merge(on: {TestError => /something went wrong/})) do
+          tries += 1
           raise TestError.new "something went wrong"
         end
       end
       ex.message.should eq "something went wrong"
+      tries.should eq(3)
+    end
+
+    it "works with a hash exception list where the value is a Proc matcher" do
+      ex_matches = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, next_interval : Time::Span) do
+        ex.should be_a TestError
+        attempt.should be <= 3
+        ex.message == "something went wrong"
+      end
+      tries = 0
+      ex = expect_raises TestError do
+        subject.retry(**nosleep_opts.merge(on: {TestError => ex_matches})) do
+          tries += 1
+          raise TestError.new "something went wrong"
+        end
+      end
+      ex.message.should eq "something went wrong"
+      tries.should eq(3)
+    end
+
+    it "works with a Proc matcher" do
+      ex_matches = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, next_interval : Time::Span) do
+        ex.should be_a TestError
+        attempt.should be <= 3
+        ex.class <= TestError && ex.message == "something went wrong"
+      end
+      tries = 0
+      ex = expect_raises TestError do
+        subject.retry(**nosleep_opts.merge(on: ex_matches)) do
+          tries += 1
+          raise TestError.new "something went wrong"
+        end
+      end
+      ex.message.should eq "something went wrong"
+      tries.should eq(3)
     end
 
     it "works with a hash exception list matches exception subclasses" do
