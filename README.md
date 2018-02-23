@@ -76,7 +76,7 @@ Here are the available options, in some vague order of relevance to most common 
 - A `Hash` where the keys are `Exception` classes and the values are one of:
   - `nil` (retry every exception of the key's type, including subclasses)
   - A single `Proc` (retries exceptions ONLY for non `nil` returns)
-  - A single `Regexp` pattern (retries exceptions ONLY if their `message` matches the pattern)
+  - A single `Regex` pattern (retries exceptions ONLY if their `message` matches the pattern)
   - An `Enumerable` of patterns (retries exceptions ONLY if their `message` matches at least one of the patterns)
 
 ### Configuration
@@ -108,7 +108,7 @@ Retriable.retry(on: {IO::Timeout, Errno::ECONNRESET}) do
 end
 ```
 
-You can also use a hash to specify that you only want to retry exceptions with certain messages (see [the documentation above](#configuring-which-options-to-retry-with-on)).  This example will retry all `ActiveRecord::RecordNotUnique` exceptions, `ActiveRecord::RecordInvalid` exceptions where the message matches either `/Parent must exist/` or `/Username has already been taken/`, or `Mysql2::Error` exceptions where the message matches `/Duplicate entry/`.
+You can also use a hash to specify that you only want to retry exceptions with certain messages (see [the documentation above](#configuring-which-options-to-retry-with-on)). This example will retry all `ActiveRecord::RecordNotUnique` exceptions, `ActiveRecord::RecordInvalid` exceptions where the message matches either `/Parent must exist/` or `/Username has already been taken/`, or `Mysql2::Error` exceptions where the message matches `/Duplicate entry/`.
 
 ```crystal
 Retriable.retry(on: {
@@ -137,7 +137,7 @@ This example makes 5 total attempts. If the first attempt fails, the 2nd attempt
 
 ### Turning off exponential backoff
 
-Exponential backoff is enabled by default.  If you want to simply retry code every second, 5 times maximum, you can do this:
+Exponential backoff is enabled by default. If you want to simply retry code every second, 5 times maximum, you can do this:
 
 ```crystal
 Retriable.retry(times: 5, base_interval: 1.second, multiplier: 1.0, rand_factor: 0.0) do
@@ -175,7 +175,7 @@ end
 
 ### Callbacks
 
-`#retry` also provides a callback called `:on_retry` that will run after an exception is rescued. This callback provides the `exception` that was raised in the current try, the `try_number`, the `elapsed_time` for all tries so far, and the time in seconds of the `next_interval`.
+`#retry` also provides a callback called `:on_retry` that will run after an exception is rescued. This callback provides the `exception` that was raised in the current try, the `try_number`, the `elapsed_time` for all tries so far, and the time (as a `Time::Span`) of the `next_interval`.
 
 ```crystal
 do_this_on_each_retry = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, next_interval : Time::Span) do
