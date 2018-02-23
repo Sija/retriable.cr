@@ -79,7 +79,7 @@ describe Retriable do
     end
 
     it "returns inner value when given block doesn't raise" do
-      inner_return = subject.retry **nosleep_opts.merge(times: 10) do |i|
+      inner_return = subject.retry(**nosleep_opts.merge(times: 10)) do |i|
         raise "foo #{i}!" if i < 3
         "bar #{i}!"
       end
@@ -87,7 +87,7 @@ describe Retriable do
     end
 
     it "breaks the loop without given value" do
-      inner_return = subject.retry **nosleep_opts.merge(times: 10) do |i|
+      inner_return = subject.retry(**nosleep_opts.merge(times: 10)) do |i|
         break if i == 3
         raise "foo!"
       end
@@ -95,7 +95,7 @@ describe Retriable do
     end
 
     it "returns value passed to break" do
-      inner_return = subject.retry **nosleep_opts do
+      inner_return = subject.retry(**nosleep_opts) do
         break "bar!"
         "baz!"
       end
@@ -103,7 +103,7 @@ describe Retriable do
     end
 
     it "returns value passed to next" do
-      inner_return = subject.retry **nosleep_opts do
+      inner_return = subject.retry(**nosleep_opts) do
         next "bar!"
         "baz!"
       end
@@ -223,6 +223,7 @@ describe Retriable do
         3 => 1.125.seconds,
         4 => 1.5.seconds,
       })
+      tries.should eq(5)
     end
 
     it "works with custom defined intervals" do
