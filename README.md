@@ -122,7 +122,7 @@ end
 You can also bypass the built-in interval generation and provide your own `Enumerable` of intervals. Supplying your own intervals overrides the `max_attempts`, `base_interval`, `max_interval`, `rand_factor`, and `multiplier` parameters.
 
 ```crystal
-Retriable.retry(intervals: {0.5, 1.0, 2.0, 2.5}.map(&.seconds)) do
+Retriable.retry(intervals: {0.5, 1.0, 2.0, 2.5}) do
   # code here...
 end
 ```

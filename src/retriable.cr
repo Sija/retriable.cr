@@ -48,6 +48,11 @@ module Retriable
     )
 
     case intervals
+    when Enumerable(Int::Primitive | Float64)
+      intervals = intervals.map(&.seconds)
+    end
+
+    case intervals
     when Enumerable(Time::Span)
       intervals_size = intervals.size + 1
       intervals = intervals.each.rewind

@@ -212,13 +212,13 @@ describe Retriable do
     end
 
     it "works with custom defined intervals" do
-      intervals = [
+      intervals = {
         0.5,
         0.75,
         1.125,
         1.5,
         1.5,
-      ].map(&.seconds)
+      }
 
       tries = 0
       time_table = {} of Int32 => Time::Span
