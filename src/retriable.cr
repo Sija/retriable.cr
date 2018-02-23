@@ -18,6 +18,13 @@ require "./retriable/*"
 module Retriable
   extend self
 
+  private abstract class Retry
+  end
+
+  def retry
+    Retry
+  end
+
   def retry(on = nil, **opts)
     base_interval = opts[:base_interval]? || settings.base_interval
     max_interval = opts[:max_interval]? || settings.max_interval
@@ -78,7 +85,10 @@ module Retriable
     loop do |index|
       attempt = index + 1
       begin
-        return yield attempt
+        return_value = yield attempt
+        unless return_value == Retry
+          return return_value
+        end
       rescue ex
         elapsed_time = Time.monotonic - start_time
 

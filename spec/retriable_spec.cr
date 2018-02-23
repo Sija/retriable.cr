@@ -56,6 +56,20 @@ describe Retriable do
       tries.should eq(10)
     end
 
+    context "#retry with no arguments" do
+      it "retries given block" do
+        tries = 0
+
+        return_value = subject.retry(**nosleep_opts.merge(times: 10)) do
+          tries += 1
+          next subject.retry if tries < 5
+          next "fin"
+        end
+        return_value.should eq "fin"
+        tries.should eq 5
+      end
+    end
+
     it "stops at first try if the block does not raise an exception" do
       tries = 0
       subject.retry(**nosleep_opts) do
