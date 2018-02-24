@@ -76,11 +76,6 @@ module Retriable
       intervals = backoff.intervals
     end
 
-    case on
-    when Exception.class
-      on = {on}
-    end
-
     start_time = Time.monotonic
     loop do |index|
       attempt = index + 1
@@ -99,23 +94,38 @@ module Retriable
         end
 
         case on
+        when Exception.class
+          raise ex unless on >= ex.class
         when Proc
           raise ex unless on.call(ex, attempt, elapsed_time, interval)
-        when Hash, NamedTuple
-          ex_matches = on.any? do |klass, messages|
-            next ex.class <= klass unless messages
-            case messages
+        when Hash
+          ex_matches = on.any? do |klass, value|
+            next unless klass >= ex.class
+            case value
+            when Nil
+              true
             when Proc
-              ex.class <= klass && messages.call(ex, attempt, elapsed_time, interval)
+              value.call(ex, attempt, elapsed_time, interval)
             when Regex
-              ex.class <= klass && messages.match(ex.message.to_s)
+              value.match(ex.message.to_s)
             when Enumerable
-              ex.class <= klass && messages.any? &.match(ex.message.to_s)
+              value.any? do |matcher|
+                case matcher
+                when Proc  then matcher.call(ex, attempt, elapsed_time, interval)
+                when Regex then matcher.match(ex.message.to_s)
+                end
+              end
             end
           end
           raise ex unless ex_matches
-        else
-          raise ex unless on.any? &.>= ex.class
+        when Enumerable
+          ex_matches = on.any? do |matcher|
+            case matcher
+            when Exception.class then matcher >= ex.class
+            when Proc            then matcher.call(ex, attempt, elapsed_time, interval)
+            end
+          end
+          raise ex unless ex_matches
         end
 
         raise ex if max_attempts && (attempt >= max_attempts)
