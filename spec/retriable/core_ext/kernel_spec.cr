@@ -20,7 +20,7 @@ describe Retriable::KernelExtension do
 
       return_value = retry times: 10 do
         tries += 1
-        next retry if tries < 5
+        retry if tries < 5
         "finished"
       end
       return_value.should eq "finished"

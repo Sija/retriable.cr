@@ -18,11 +18,12 @@ require "./retriable/*"
 module Retriable
   extend self
 
-  private abstract class Retry
+  private class Retry < Exception
+    INSTANCE = new
   end
 
   def retry
-    Retry
+    raise Retry::INSTANCE
   end
 
   def retry(on = nil, **opts)
@@ -85,10 +86,9 @@ module Retriable
     loop do |index|
       attempt = index + 1
       begin
-        return_value = yield attempt
-        unless return_value == Retry
-          return return_value
-        end
+        return yield attempt
+      rescue Retry
+        next # pass
       rescue ex
         elapsed_time = Time.monotonic - start_time
 

@@ -62,8 +62,8 @@ describe Retriable do
 
         return_value = subject.retry(**nosleep_opts.merge(times: 10)) do
           tries += 1
-          next subject.retry if tries < 5
-          next "fin"
+          subject.retry if tries < 5
+          "fin"
         end
         return_value.should eq "fin"
         tries.should eq 5

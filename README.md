@@ -14,7 +14,7 @@ dependencies:
 ## Usage
 
 Code in a `Retriable.retry` block will be retried if either an exception is
-raised or `next retry` is called.
+raised or `retry` (without arguments or block) is called.
 
 ```crystal
 require "retriable"
