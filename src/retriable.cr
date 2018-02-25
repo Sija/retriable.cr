@@ -81,9 +81,7 @@ module Retriable
       attempt = index + 1
       begin
         return_value = yield attempt
-        unless return_value == Retry
-          return return_value
-        end
+        return return_value unless return_value == Retry
       rescue ex
         elapsed_time = Time.monotonic - start_time
 
