@@ -93,41 +93,7 @@ module Retriable
           interval = intervals.first
         end
 
-        case on
-        when Exception.class
-          raise ex unless on >= ex.class
-        when Proc
-          raise ex unless on.call(ex, attempt, elapsed_time, interval)
-        when Hash
-          ex_matches = on.any? do |klass, value|
-            next unless klass >= ex.class
-            case value
-            when Nil
-              true
-            when Proc
-              value.call(ex, attempt, elapsed_time, interval)
-            when Regex
-              value.match(ex.message.to_s)
-            when Enumerable
-              value.any? do |matcher|
-                case matcher
-                when Proc  then matcher.call(ex, attempt, elapsed_time, interval)
-                when Regex then matcher.match(ex.message.to_s)
-                end
-              end
-            end
-          end
-          raise ex unless ex_matches
-        when Enumerable
-          ex_matches = on.any? do |matcher|
-            case matcher
-            when Exception.class then matcher >= ex.class
-            when Proc            then matcher.call(ex, attempt, elapsed_time, interval)
-            end
-          end
-          raise ex unless ex_matches
-        end
-
+        raise ex if !matches_exception?(on, ex, attempt, elapsed_time, interval)
         raise ex if max_attempts && (attempt >= max_attempts)
         raise ex if (elapsed_time + interval) > max_elapsed_time
 
@@ -135,6 +101,43 @@ module Retriable
 
         sleep interval unless sleep_disabled || interval.zero?
       end
+    end
+  end
+
+  protected def matches_exception?(on, ex, *proc_args)
+    case on
+    when Nil
+      true
+    when Exception.class
+      on >= ex.class
+    when Regex
+      on =~ ex.message
+    when Proc
+      on.call(ex, *proc_args)
+    when Hash
+      on.any? do |klass, value|
+        next unless klass >= ex.class
+        case value
+        when Nil, Regex, Proc
+          matches_exception?(value, ex, *proc_args)
+        when Enumerable
+          value.any? do |matcher|
+            case matcher
+            when Regex, Proc
+              matches_exception?(matcher, ex, *proc_args)
+            end
+          end
+        end
+      end
+    when Enumerable
+      on.any? do |matcher|
+        case matcher
+        when Exception.class, Proc
+          matches_exception?(matcher, ex, *proc_args)
+        end
+      end
+    else
+      false
     end
   end
 end
