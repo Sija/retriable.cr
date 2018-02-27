@@ -91,7 +91,7 @@ module Retriable
           interval = intervals.first
         end
 
-        raise ex if !matches_exception?(on, ex, attempt, elapsed_time, interval)
+        raise ex if should_raise?(on, ex, attempt, elapsed_time, interval)
         raise ex if max_attempts && (attempt >= max_attempts)
         raise ex if (elapsed_time + interval) > max_elapsed_time
 
@@ -102,7 +102,11 @@ module Retriable
     end
   end
 
-  protected def matches_exception?(on, ex, *proc_args)
+  protected def should_raise?(on : Nil | Exception.class | Proc | Enumerable, ex, *proc_args)
+    !matches_exception?(on, ex, *proc_args)
+  end
+
+  protected def matches_exception?(on : Nil | Exception.class | Regex | Proc | Enumerable, ex, *proc_args)
     case on
     when Nil
       true
@@ -134,8 +138,6 @@ module Retriable
           matches_exception?(matcher, ex, *proc_args)
         end
       end
-    else
-      false
     end
   end
 end
