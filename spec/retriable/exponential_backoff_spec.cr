@@ -11,6 +11,16 @@ describe Retriable::ExponentialBackoff do
     multiplier:    1.5,
   }
 
+  context "#randomize?" do
+    it "returns true if @rand_factor is not 0" do
+      subject.new(**opts).randomize?.should be_true
+    end
+
+    it "returns false if @rand_factor is 0" do
+      subject.new(**opts.merge(rand_factor: 0.0)).randomize?.should be_false
+    end
+  end
+
   it "defaults to Random::DEFAULT" do
     subject.new(**opts.merge(random: nil)).random.should eq Random::DEFAULT
   end
