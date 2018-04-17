@@ -6,7 +6,7 @@ module Retriable
     property multiplier : Float64
     property random : Random { Random::DEFAULT }
 
-    def initialize(@base_interval, @max_interval, @rand_factor, @multiplier, @random)
+    def initialize(@base_interval, @max_interval, @rand_factor, @multiplier, @random = nil)
     end
 
     def intervals : Iterator(Time::Span)
