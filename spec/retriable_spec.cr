@@ -1,12 +1,12 @@
 require "./spec_helper"
 
-class TestError < Exception
+private class TestError < Exception
 end
 
-class SecondTestError < TestError
+private class SecondTestError < TestError
 end
 
-class DifferentTestError < Exception
+private class DifferentTestError < Exception
 end
 
 describe Retriable do
