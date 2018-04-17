@@ -56,7 +56,7 @@ Here are the available options, in some vague order of relevance to most common 
 | Option                  | Default           | Definition                    |
 | ----------------------- | ----------------- | ----------------------------- |
 | **`max_attempts`**      | `nil`             | Number of attempts to make at running your code block (includes initial attempt). |
-| **`on`**                | `[Exception]`     | Type of exceptions to retry. [Read more](#configuring-which-options-to-retry-with-on). |
+| **`on`**                | `nil`             | Type of exceptions to retry. [Read more](#configuring-which-options-to-retry-with-on). |
 | **`on_retry`**          | `nil`             | `Proc` to call after each try is rescued. [Read more](#callbacks). |
 | **`base_interval`**     | `0.5.seconds`     | The initial interval between tries. |
 | **`max_elapsed_time`**  | `15.minutes`      | The maximum amount of total time that code is allowed to keep being retried. |

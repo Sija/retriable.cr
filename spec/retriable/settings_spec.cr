@@ -35,8 +35,8 @@ describe Retriable::Settings do
     settings.timeout.should be_nil
   end
 
-  it "on defaults to Exception.class" do
-    settings.on.should eq Exception
+  it "on defaults to nil" do
+    settings.on.should be_nil
   end
 
   it "on retry handler defaults to nil" do
