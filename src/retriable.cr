@@ -76,8 +76,9 @@ module Retriable
     end
 
     start_time = Time.monotonic
-    loop do |index|
-      attempt = index + 1
+    attempt = 0_u64
+    loop do
+      attempt += 1_u64
       begin
         return_value = yield attempt
         return return_value unless return_value == Retry

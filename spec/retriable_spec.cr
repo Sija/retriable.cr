@@ -26,7 +26,7 @@ describe Retriable do
       tries = 0
       time_table = [] of Time::Span
 
-      handler = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, next_interval : Time::Span) do
+      handler = ->(ex : Exception, attempt : UInt64, elapsed_time : Time::Span, next_interval : Time::Span) do
         time_table << next_interval
       end
 
@@ -163,9 +163,9 @@ describe Retriable do
       total_tries = 6
 
       tries = 0
-      time_table = {} of Int32 => Time::Span
+      time_table = {} of UInt64 => Time::Span
 
-      handler = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, next_interval : Time::Span) do
+      handler = ->(ex : Exception, attempt : UInt64, elapsed_time : Time::Span, next_interval : Time::Span) do
         ex.should be_a ArgumentError
         time_table[attempt] = next_interval
       end
@@ -198,9 +198,9 @@ describe Retriable do
 
     it "has a max interval of 1.5 seconds" do
       tries = 0
-      time_table = {} of Int32 => Time::Span
+      time_table = {} of UInt64 => Time::Span
 
-      handler = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, next_interval : Time::Span) do
+      handler = ->(ex : Exception, attempt : UInt64, elapsed_time : Time::Span, next_interval : Time::Span) do
         time_table[attempt] = next_interval
       end
 
@@ -236,9 +236,9 @@ describe Retriable do
       }
 
       tries = 0
-      time_table = {} of Int32 => Time::Span
+      time_table = {} of UInt64 => Time::Span
 
-      handler = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, next_interval : Time::Span) do
+      handler = ->(ex : Exception, attempt : UInt64, elapsed_time : Time::Span, next_interval : Time::Span) do
         time_table[attempt] = next_interval
       end
 
@@ -275,7 +275,7 @@ describe Retriable do
     end
 
     it "works with a hash exception list where the value is a Proc matcher" do
-      ex_matches = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, next_interval : Time::Span) do
+      ex_matches = ->(ex : Exception, attempt : UInt64, elapsed_time : Time::Span, next_interval : Time::Span) do
         ex.should be_a TestError
         attempt.should be <= 3
         ex.message == "something went wrong"
@@ -292,7 +292,7 @@ describe Retriable do
     end
 
     it "works with a Proc matcher" do
-      ex_matches = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, next_interval : Time::Span) do
+      ex_matches = ->(ex : Exception, attempt : UInt64, elapsed_time : Time::Span, next_interval : Time::Span) do
         ex.should be_a TestError
         attempt.should be <= 3
         ex.class <= TestError && ex.message == "something went wrong"
@@ -343,9 +343,9 @@ describe Retriable do
 
     it "works with a hash exception list where the values are exception message patterns" do
       tries = 0
-      exceptions = {} of Int32 => Exception
+      exceptions = {} of UInt64 => Exception
 
-      handler = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, next_interval : Time::Span) do
+      handler = ->(ex : Exception, attempt : UInt64, elapsed_time : Time::Span, next_interval : Time::Span) do
         exceptions[attempt] = ex
       end
 
@@ -388,9 +388,9 @@ describe Retriable do
     )
 
     tries = 0
-    time_table = {} of Int32 => Time::Span
+    time_table = {} of UInt64 => Time::Span
 
-    handler = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, next_interval : Time::Span) do
+    handler = ->(ex : Exception, attempt : UInt64, elapsed_time : Time::Span, next_interval : Time::Span) do
       time_table[attempt] = next_interval
     end
 
