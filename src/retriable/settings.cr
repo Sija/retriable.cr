@@ -10,7 +10,6 @@ module Retriable
     setting max_interval : Time::Span = 1.minute
     setting multiplier : Float64 = 1.5
     setting sleep_disabled : Bool = false
-    setting timeout : Time::Span?
     setting rand_factor : Float64 = 0.5
     setting random : Random = Random::DEFAULT
     setting intervals : Array(Time::Span)?

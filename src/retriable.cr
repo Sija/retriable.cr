@@ -34,7 +34,6 @@ module Retriable
     max_elapsed_time = opts[:max_elapsed_time]? || settings.max_elapsed_time
     intervals = opts[:intervals]? || settings.intervals?
     max_attempts = opts[:times]? || opts[:max_attempts]? || settings.max_attempts?
-    timeout = opts[:timeout]? || settings.timeout?
     sleep_disabled = opts[:sleep_disabled]? || settings.sleep_disabled
     on = on || opts[:only]? || settings.on
     on_retry = opts[:on_retry]? || settings.on_retry?

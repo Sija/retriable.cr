@@ -31,10 +31,6 @@ describe Retriable::Settings do
     settings.intervals.should be_nil
   end
 
-  it "timeout defaults to nil" do
-    settings.timeout.should be_nil
-  end
-
   it "on defaults to nil" do
     settings.on.should be_nil
   end
