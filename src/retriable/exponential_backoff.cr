@@ -17,7 +17,7 @@ module Retriable
       should_randomize = randomize?
       (0..Int32::MAX).each.map do |iteration|
         interval = {@base_interval * @multiplier**iteration, @max_interval}.min
-        interval = should_randomize ? randomize(interval) : interval
+        should_randomize ? randomize(interval) : interval
       end
     end
 
