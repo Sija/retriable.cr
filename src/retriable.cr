@@ -35,6 +35,7 @@ module Retriable
     intervals = opts[:intervals]? || settings.intervals?
     max_attempts = opts[:times]? || opts[:max_attempts]? || settings.max_attempts?
     sleep_disabled = opts[:sleep_disabled]? || settings.sleep_disabled
+    except = opts[:except]? || settings.except
     on = on || opts[:only]? || settings.on
     on_retry = opts[:on_retry]? || settings.on_retry?
     backoff = opts[:backoff]? || settings.backoff
@@ -92,6 +93,8 @@ module Retriable
         end
 
         raise ex if on && should_raise?(on, ex, attempt, elapsed_time, interval)
+        raise ex if except && !should_raise?(except, ex, attempt, elapsed_time, interval)
+
         raise ex if max_attempts && (attempt >= max_attempts)
         raise ex if (elapsed_time + interval) > max_elapsed_time
 

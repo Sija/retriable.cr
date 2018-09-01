@@ -56,7 +56,8 @@ Here are the available options, in some vague order of relevance to most common 
 | Option                  | Default           | Definition                    |
 | ----------------------- | ----------------- | ----------------------------- |
 | **`max_attempts`**      | `nil`             | Number of attempts to make at running your code block (includes initial attempt). |
-| **`on`**                | `nil`             | Type of exceptions to retry. [Read more](#configuring-which-options-to-retry-with-on). |
+| **`except`**            | `nil`             | Type of exceptions to NOT retry. [Read more](#configuring-which-options-to-retry-with-on-except). |
+| **`on`**                | `nil`             | Type of exceptions to retry. [Read more](#configuring-which-options-to-retry-with-on-except). |
 | **`on_retry`**          | `nil`             | `Proc` to call after each try is rescued. [Read more](#callbacks). |
 | **`base_interval`**     | `0.5.seconds`     | The initial interval between tries. |
 | **`max_elapsed_time`**  | `15.minutes`      | The maximum amount of total time that code is allowed to keep being retried. |
@@ -67,8 +68,8 @@ Here are the available options, in some vague order of relevance to most common 
 | **`backoff`**           | `true`            | Whether backoff strategy should be used. |
 | **`random`**            | `Random::DEFAULT` | Object inheriting from `Random`, which provides an interface for random values generation, using a pseudo random number generator (PRNG). |
 
-#### Configuring which options to retry with :on
-**`:on`** Can take the form:
+#### Configuring which options to retry with :on/:except
+**`:on`** / **`:except`** Can take the form:
 
 - An `Exception` class (retry every exception of this type, including subclasses)
 - An `Enumerable` of `Exception` classes (retry any exception of one of these types, including subclasses)

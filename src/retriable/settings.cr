@@ -3,6 +3,7 @@ require "habitat"
 module Retriable
   Habitat.create do
     setting max_attempts : UInt64?
+    setting except : Exception.class | Array(Exception.class) | Nil
     setting on : Exception.class | Array(Exception.class) | Nil
     setting on_retry : Proc(Exception, UInt64, Time::Span, Time::Span, Nil)?
     setting base_interval : Time::Span = 0.5.seconds

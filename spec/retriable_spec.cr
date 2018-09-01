@@ -159,6 +159,42 @@ describe Retriable do
       tries.should eq 10
     end
 
+    it "makes only 1 try when exception raised matches given exception class" do
+      tries = 0
+
+      expect_raises SecondTestError, "Bad foo" do
+        subject.retry(**nosleep_opts.merge(times: 10, except: SecondTestError)) do
+          tries += 1
+          case tries
+          when .< 2
+            raise ArgumentError.new "Just foo"
+          when .< 3
+            raise TestError.new "Another foo"
+          else
+            raise SecondTestError.new "Bad foo"
+          end
+        end
+      end
+      tries.should eq 3
+    end
+
+    it "makes only 1 try when exception raised matches given exception class" do
+      tries = 0
+
+      expect_raises SecondTestError, "Bad foo" do
+        subject.retry(**nosleep_opts.merge(times: 10, on: TestError, except: SecondTestError)) do
+          tries += 1
+          case tries
+          when .< 2
+            raise SecondTestError.new "Bad foo"
+          else
+            raise TestError.new "Another foo"
+          end
+        end
+      end
+      tries.should eq 1
+    end
+
     describe "retries with an on_retry handler, 6 max retries, and a 0.0 rand_factor" do
       total_tries = 6
 
