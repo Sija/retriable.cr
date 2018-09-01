@@ -349,9 +349,8 @@ describe Retriable do
       ex = expect_raises SecondTestError do
         subject.retry(**nosleep_opts.merge(
           on: {
-            DifferentTestError => /should never happen/,
             TestError          => /something went wrong/,
-            DifferentTestError => /also should never happen/,
+            DifferentTestError => /should never happen/,
           },
           times: 4
         )) do
@@ -413,6 +412,7 @@ describe Retriable do
       exceptions[2].class.should eq TestError
       exceptions[2].message.should eq "bar"
       exceptions[3].class.should eq ArgumentError
+      exceptions[3].message.should eq "baz"
       exceptions[4].class.should eq ArgumentError
       exceptions[4].message.should be_nil
     end
