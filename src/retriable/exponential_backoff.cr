@@ -15,7 +15,7 @@ module Retriable
 
     def intervals : Iterator(Time::Span)
       should_randomize = randomize?
-      (0_u64..UInt64::MAX).each.map do |iteration|
+      (0..Int32::MAX).each.map do |iteration|
         interval = {@base_interval * @multiplier**iteration, @max_interval}.min
         should_randomize ? randomize(interval) : interval
       end
