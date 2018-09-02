@@ -3,14 +3,14 @@ require "habitat"
 module Retriable
   Habitat.create do
     setting max_attempts : Int32?
-    setting on : Exception.class | Array(Exception.class) = Exception
+    setting except : Exception.class | Array(Exception.class) | Nil
+    setting on : Exception.class | Array(Exception.class) | Nil
     setting on_retry : Proc(Exception, Int32, Time::Span, Time::Span, Nil)?
     setting base_interval : Time::Span = 0.5.seconds
     setting max_elapsed_time : Time::Span = 15.minutes
     setting max_interval : Time::Span = 1.minute
     setting multiplier : Float64 = 1.5
     setting sleep_disabled : Bool = false
-    setting timeout : Time::Span?
     setting rand_factor : Float64 = 0.5
     setting random : Random = Random::DEFAULT
     setting intervals : Array(Time::Span)?

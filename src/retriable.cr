@@ -34,8 +34,8 @@ module Retriable
     max_elapsed_time = opts[:max_elapsed_time]? || settings.max_elapsed_time
     intervals = opts[:intervals]? || settings.intervals?
     max_attempts = opts[:times]? || opts[:max_attempts]? || settings.max_attempts?
-    timeout = opts[:timeout]? || settings.timeout?
     sleep_disabled = opts[:sleep_disabled]? || settings.sleep_disabled
+    except = opts[:except]? || settings.except
     on = on || opts[:only]? || settings.on
     on_retry = opts[:on_retry]? || settings.on_retry?
     backoff = opts[:backoff]? || settings.backoff
@@ -76,19 +76,13 @@ module Retriable
       intervals = backoff.intervals
     end
 
-    case on
-    when Exception.class
-      on = {on}
-    end
-
     start_time = Time.monotonic
-    loop do |index|
-      attempt = index + 1
+    attempt = 0
+    loop do
+      attempt += 1
       begin
         return_value = yield attempt
-        unless return_value == Retry
-          return return_value
-        end
+        return return_value unless return_value == Retry
       rescue ex
         elapsed_time = Time.monotonic - start_time
 
@@ -98,25 +92,8 @@ module Retriable
           interval = intervals.first
         end
 
-        case on
-        when Proc
-          raise ex unless on.call(ex, attempt, elapsed_time, interval)
-        when Hash, NamedTuple
-          ex_matches = on.any? do |klass, messages|
-            next ex.class <= klass unless messages
-            case messages
-            when Proc
-              ex.class <= klass && messages.call(ex, attempt, elapsed_time, interval)
-            when Regex
-              ex.class <= klass && messages.match(ex.message.to_s)
-            when Enumerable
-              ex.class <= klass && messages.any? &.match(ex.message.to_s)
-            end
-          end
-          raise ex unless ex_matches
-        else
-          raise ex unless on.any? &.>= ex.class
-        end
+        raise ex if on && should_raise?(on, ex, attempt, elapsed_time, interval)
+        raise ex if except && !should_raise?(except, ex, attempt, elapsed_time, interval)
 
         raise ex if max_attempts && (attempt >= max_attempts)
         raise ex if (elapsed_time + interval) > max_elapsed_time
@@ -124,6 +101,45 @@ module Retriable
         on_retry.try &.call(ex, attempt, elapsed_time, interval)
 
         sleep interval unless sleep_disabled || interval.zero?
+      end
+    end
+  end
+
+  protected def should_raise?(on : Exception.class | Proc | Enumerable, ex, *proc_args)
+    !matches_exception?(on, ex, *proc_args)
+  end
+
+  protected def matches_exception?(on : Nil | Exception.class | Regex | Proc | Enumerable, ex, *proc_args)
+    case on
+    when Nil
+      true
+    when Exception.class
+      on >= ex.class
+    when Regex
+      on =~ ex.message
+    when Proc
+      on.call(ex, *proc_args)
+    when Hash
+      on.any? do |klass, value|
+        next unless klass >= ex.class
+        case value
+        when Nil, Regex, Proc
+          matches_exception?(value, ex, *proc_args)
+        when Enumerable
+          value.any? do |matcher|
+            case matcher
+            when Regex, Proc
+              matches_exception?(matcher, ex, *proc_args)
+            end
+          end
+        end
+      end
+    when Enumerable
+      on.any? do |matcher|
+        case matcher
+        when Exception.class, Proc
+          matches_exception?(matcher, ex, *proc_args)
+        end
       end
     end
   end

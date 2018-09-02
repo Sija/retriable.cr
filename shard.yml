@@ -7,8 +7,13 @@ authors:
 dependencies:
   habitat:
     github: luckyframework/habitat
-    branch: master
+    version: ~> 0.4.0
 
-crystal: 0.24.1+149
+development_dependencies:
+  ameba:
+    github: veelenga/ameba
+    version: 0.8.0
+
+crystal: 0.26.0
 
 license: MIT

@@ -1,12 +1,12 @@
 require "./spec_helper"
 
-class TestError < Exception
+private class TestError < Exception
 end
 
-class SecondTestError < TestError
+private class SecondTestError < TestError
 end
 
-class DifferentTestError < Exception
+private class DifferentTestError < Exception
 end
 
 describe Retriable do
@@ -157,6 +157,42 @@ describe Retriable do
         end
       end
       tries.should eq 10
+    end
+
+    it "makes only 1 try when exception raised matches given exception class" do
+      tries = 0
+
+      expect_raises SecondTestError, "Bad foo" do
+        subject.retry(**nosleep_opts.merge(times: 10, except: SecondTestError)) do
+          tries += 1
+          case tries
+          when .< 2
+            raise ArgumentError.new "Just foo"
+          when .< 3
+            raise TestError.new "Another foo"
+          else
+            raise SecondTestError.new "Bad foo"
+          end
+        end
+      end
+      tries.should eq 3
+    end
+
+    it "makes only 1 try when exception raised matches given exception class" do
+      tries = 0
+
+      expect_raises SecondTestError, "Bad foo" do
+        subject.retry(**nosleep_opts.merge(times: 10, on: TestError, except: SecondTestError)) do
+          tries += 1
+          case tries
+          when .< 2
+            raise SecondTestError.new "Bad foo"
+          else
+            raise TestError.new "Another foo"
+          end
+        end
+      end
+      tries.should eq 1
     end
 
     describe "retries with an on_retry handler, 6 max retries, and a 0.0 rand_factor" do
@@ -313,9 +349,8 @@ describe Retriable do
       ex = expect_raises SecondTestError do
         subject.retry(**nosleep_opts.merge(
           on: {
-            DifferentTestError => /should never happen/,
             TestError          => /something went wrong/,
-            DifferentTestError => /also should never happen/,
+            DifferentTestError => /should never happen/,
           },
           times: 4
         )) do
@@ -377,6 +412,7 @@ describe Retriable do
       exceptions[2].class.should eq TestError
       exceptions[2].message.should eq "bar"
       exceptions[3].class.should eq ArgumentError
+      exceptions[3].message.should eq "baz"
       exceptions[4].class.should eq ArgumentError
       exceptions[4].message.should be_nil
     end

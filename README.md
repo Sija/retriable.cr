@@ -1,4 +1,4 @@
-# retriable.cr [![Build Status](https://travis-ci.org/Sija/retriable.cr.svg?branch=master)](https://travis-ci.org/Sija/retriable.cr)
+# retriable.cr [![Build Status](https://travis-ci.org/Sija/retriable.cr.svg?branch=master)](https://travis-ci.org/Sija/retriable.cr) [![Releases](https://img.shields.io/github/release/Sija/retriable.cr.svg)](https://github.com/Sija/retriable.cr/releases) [![License](https://img.shields.io/github/license/Sija/retriable.cr.svg)](https://github.com/Sija/retriable.cr/blob/master/LICENSE)
 
 Retriable is a simple DSL to retry failed code blocks with randomized [exponential backoff](https://en.wikipedia.org/wiki/Exponential_backoff) time intervals. This is especially useful when interacting external APIs, remote services, or file system calls.
 ## Installation
@@ -8,7 +8,7 @@ Add this to your application's `shard.yml`:
 ```yaml
 dependencies:
   retriable:
-    github: sija/retriable.cr
+    github: Sija/retriable.cr
 ```
 
 ## Usage
@@ -53,26 +53,27 @@ The default interval table with 10 tries looks like this (in seconds, rounded to
 
 Here are the available options, in some vague order of relevance to most common use patterns:
 
-| Option | Default | Definition |
-| ------ | ------- | ---------- |
-| **`max_attempts`** | `nil` | Number of attempts to make at running your code block (includes initial attempt). |
-| **`on`** | `[Exception]` | Type of exceptions to retry. [Read more](#configuring-which-options-to-retry-with-on). |
-| **`on_retry`** | `nil` | `Proc` to call after each try is rescued. [Read more](#callbacks). |
-| **`base_interval`** | `0.5.seconds` | The initial interval between tries. |
-| **`max_elapsed_time`** | `15.minutes` | The maximum amount of total time that code is allowed to keep being retried. |
-| **`max_interval`** | `1.minute` | The maximum interval that any individual retry can reach. |
-| **`multiplier`** | `1.5` | Each successive interval grows by this factor. A multiplier of 1.5 means the next interval will be 1.5x the current interval. |
-| **`rand_factor`** | `0.5` | The percentage to randomize the next retry interval time. The next interval calculation is `randomized_interval = retry_interval * (random value in range [1 - randomization_factor, 1 + randomization_factor])` |
-| **`intervals`** | `nil` | Skip generated intervals and provide your own `Enumerable` of intervals in seconds. [Read more](#customizing-intervals). |
-| **`backoff`** | `true` | Whether backoff strategy should be used. |
-| **`random`** | `Random::DEFAULT` | Object inheriting from `Random`, which provides an interface for random values generation, using a pseudo random number generator (PRNG). |
+| Option                  | Default           | Definition                    |
+| ----------------------- | ----------------- | ----------------------------- |
+| **`max_attempts`**      | `nil`             | Number of attempts to make at running your code block (includes initial attempt). |
+| **`except`**            | `nil`             | Type of exceptions to NOT retry. [Read more](#configuring-which-options-to-retry-with-onexcept). |
+| **`on`**                | `nil`             | Type of exceptions to retry. [Read more](#configuring-which-options-to-retry-with-onexcept). |
+| **`on_retry`**          | `nil`             | `Proc` to call after each try is rescued. [Read more](#callbacks). |
+| **`base_interval`**     | `0.5.seconds`     | The initial interval between tries. |
+| **`max_elapsed_time`**  | `15.minutes`      | The maximum amount of total time that code is allowed to keep being retried. |
+| **`max_interval`**      | `1.minute`        | The maximum interval that any individual retry can reach. |
+| **`multiplier`**        | `1.5`             | Each successive interval grows by this factor. A multiplier of 1.5 means the next interval will be 1.5x the current interval. |
+| **`rand_factor`**       | `0.5`             | The percentage to randomize the next retry interval time. The next interval calculation is `randomized_interval = retry_interval * (random value in range [1 - randomization_factor, 1 + randomization_factor])` |
+| **`intervals`**         | `nil`             | Skip generated intervals and provide your own `Enumerable` of intervals in seconds. [Read more](#customizing-intervals). |
+| **`backoff`**           | `true`            | Whether backoff strategy should be used. |
+| **`random`**            | `Random::DEFAULT` | Object inheriting from `Random`, which provides an interface for random values generation, using a pseudo random number generator (PRNG). |
 
-#### Configuring which options to retry with :on
-**`:on`** Can take the form:
+#### Configuring which options to retry with :on/:except
+**`:on`** / **`:except`** Can take the form:
 
 - An `Exception` class (retry every exception of this type, including subclasses)
 - An `Enumerable` of `Exception` classes (retry any exception of one of these types, including subclasses)
-- A single `Proc` (retries exceptions ONLY if return is truthy)
+- A single `Proc` (retries exceptions ONLY if return is _truthy_)
 - A `Hash` where the keys are `Exception` classes and the values are one of:
   - `nil` (retry every exception of the key's type, including subclasses)
   - A single `Proc` (retries exceptions ONLY for non `nil` returns)
@@ -108,7 +109,7 @@ Retriable.retry(on: {IO::Timeout, Errno::ECONNRESET}) do
 end
 ```
 
-You can also use a hash to specify that you only want to retry exceptions with certain messages (see [the documentation above](#configuring-which-options-to-retry-with-on)). This example will retry all `ActiveRecord::RecordNotUnique` exceptions, `ActiveRecord::RecordInvalid` exceptions where the message matches either `/Parent must exist/` or `/Username has already been taken/`, or `Mysql2::Error` exceptions where the message matches `/Duplicate entry/`.
+You can also use a `Hash` to specify that you only want to retry exceptions with certain messages (see [the documentation above](#configuring-which-options-to-retry-with-on)). This example will retry all `ActiveRecord::RecordNotUnique` exceptions, `ActiveRecord::RecordInvalid` exceptions where the message matches either `/Parent must exist/` or `/Username has already been taken/`, or `Mysql2::Error` exceptions where the message matches `/Duplicate entry/`.
 
 ```crystal
 Retriable.retry(on: {
@@ -226,7 +227,7 @@ end
 
 ## Contributors
 
-- [Sija](https://github.com/Sija) Sijawusz Pur Rahnama - creator, maintainer
+- [@Sija](https://github.com/Sija) Sijawusz Pur Rahnama - creator, maintainer
 
 ## Thanks
 
