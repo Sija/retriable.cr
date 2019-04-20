@@ -25,6 +25,7 @@ module Retriable
     Retry
   end
 
+  # ameba:disable Metrics/CyclomaticComplexity
   def retry(on = nil, **opts)
     base_interval = opts[:base_interval]? || settings.base_interval
     max_interval = opts[:max_interval]? || settings.max_interval
@@ -109,6 +110,7 @@ module Retriable
     !matches_exception?(on, ex, *proc_args)
   end
 
+  # ameba:disable Metrics/CyclomaticComplexity
   protected def matches_exception?(on : Nil | Exception.class | Regex | Proc | Enumerable, ex, *proc_args)
     case on
     when Nil
