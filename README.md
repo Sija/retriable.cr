@@ -85,7 +85,7 @@ Here are the available options, in some vague order of relevance to most common 
 You can change the global defaults with a `#configure` block:
 
 ```crystal
-Retriable.configure do
+Retriable.configure do |settings|
   settings.max_attempts = 5
   settings.max_elapsed_time = 1.hour
 end

@@ -25,6 +25,7 @@ module Retriable
     Retry
   end
 
+  # ameba:disable Metrics/CyclomaticComplexity
   def retry(on = nil, **opts)
     base_interval = opts[:base_interval]? || settings.base_interval
     max_interval = opts[:max_interval]? || settings.max_interval
@@ -62,7 +63,7 @@ module Retriable
     case intervals
     when Enumerable(Time::Span)
       intervals_size = intervals.size + 1
-      intervals = intervals.each.rewind
+      intervals = intervals.each
       if max_attempts && !settings.max_attempts?
         if max_attempts > intervals_size
           intervals = intervals.chain(backoff.intervals.skip(intervals_size))
@@ -76,6 +77,8 @@ module Retriable
       intervals = backoff.intervals
     end
 
+    initial_intervals = intervals.dup
+
     start_time = Time.monotonic
     attempt = 0
     loop do
@@ -88,7 +91,7 @@ module Retriable
 
         case interval = intervals.next
         when Iterator::Stop
-          intervals.rewind
+          intervals = initial_intervals.dup
           interval = intervals.first
         end
 
@@ -109,6 +112,7 @@ module Retriable
     !matches_exception?(on, ex, *proc_args)
   end
 
+  # ameba:disable Metrics/CyclomaticComplexity
   protected def matches_exception?(on : Nil | Exception.class | Regex | Proc | Enumerable, ex, *proc_args)
     case on
     when Nil
