@@ -26,7 +26,7 @@ describe Retriable do
       tries = 0
       time_table = [] of Time::Span
 
-      handler = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, next_interval : Time::Span) do
+      handler = ->(_ex : Exception, _attempt : Int32, _elapsed_time : Time::Span, next_interval : Time::Span) do
         time_table << next_interval
       end
 
@@ -63,7 +63,7 @@ describe Retriable do
         return_value = subject.retry(**nosleep_opts.merge(times: 10)) do
           tries += 1
           next subject.retry if tries < 5
-          next "fin"
+          "fin"
         end
         return_value.should eq "fin"
         tries.should eq 5
@@ -201,7 +201,7 @@ describe Retriable do
       tries = 0
       time_table = {} of Int32 => Time::Span
 
-      handler = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, next_interval : Time::Span) do
+      handler = ->(ex : Exception, attempt : Int32, _elapsed_time : Time::Span, next_interval : Time::Span) do
         ex.should be_a ArgumentError
         time_table[attempt] = next_interval
       end
@@ -236,7 +236,7 @@ describe Retriable do
       tries = 0
       time_table = {} of Int32 => Time::Span
 
-      handler = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, next_interval : Time::Span) do
+      handler = ->(_ex : Exception, attempt : Int32, _elapsed_time : Time::Span, next_interval : Time::Span) do
         time_table[attempt] = next_interval
       end
 
@@ -274,7 +274,7 @@ describe Retriable do
       tries = 0
       time_table = {} of Int32 => Time::Span
 
-      handler = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, next_interval : Time::Span) do
+      handler = ->(_ex : Exception, attempt : Int32, _elapsed_time : Time::Span, next_interval : Time::Span) do
         time_table[attempt] = next_interval
       end
 
@@ -311,7 +311,7 @@ describe Retriable do
     end
 
     it "works with a hash exception list where the value is a Proc matcher" do
-      ex_matches = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, next_interval : Time::Span) do
+      ex_matches = ->(ex : Exception, attempt : Int32, _elapsed_time : Time::Span, _next_interval : Time::Span) do
         ex.should be_a TestError
         attempt.should be <= 3
         ex.message == "something went wrong"
@@ -328,7 +328,7 @@ describe Retriable do
     end
 
     it "works with a Proc matcher" do
-      ex_matches = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, next_interval : Time::Span) do
+      ex_matches = ->(ex : Exception, attempt : Int32, _elapsed_time : Time::Span, _next_interval : Time::Span) do
         ex.should be_a TestError
         attempt.should be <= 3
         ex.class <= TestError && ex.message == "something went wrong"
@@ -380,7 +380,7 @@ describe Retriable do
       tries = 0
       exceptions = {} of Int32 => Exception
 
-      handler = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, next_interval : Time::Span) do
+      handler = ->(ex : Exception, attempt : Int32, _elapsed_time : Time::Span, _next_interval : Time::Span) do
         exceptions[attempt] = ex
       end
 
@@ -426,7 +426,7 @@ describe Retriable do
     tries = 0
     time_table = {} of Int32 => Time::Span
 
-    handler = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, next_interval : Time::Span) do
+    handler = ->(_ex : Exception, attempt : Int32, _elapsed_time : Time::Span, next_interval : Time::Span) do
       time_table[attempt] = next_interval
     end
 
