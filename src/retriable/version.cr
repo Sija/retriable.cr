@@ -1,3 +1,3 @@
 module Retriable
-  VERSION = "0.2.0"
+  VERSION = {{ `shards version "#{__DIR__}"`.chomp.stringify }}
 end
