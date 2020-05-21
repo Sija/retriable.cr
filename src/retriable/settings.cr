@@ -14,13 +14,6 @@ module Retriable
     property intervals : Array(Time::Span)?
     property? backoff : Bool = true
 
-    def on_retry=(block : (Exception, Int32, Time::Span, Time::Span) -> _)
-      @on_retry = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, interval : Time::Span) do
-        block.call(ex, attempt, elapsed_time, interval)
-        nil
-      end
-    end
-
     def on_retry(&block : (Exception, Int32, Time::Span, Time::Span) -> _)
       self.on_retry = block
     end
