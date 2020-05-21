@@ -21,6 +21,12 @@ module Retriable
   private abstract class Retry
   end
 
+  class_getter settings : Settings { Settings.new }
+
+  def configure : Nil
+    yield settings
+  end
+
   def retry
     Retry
   end
@@ -33,13 +39,13 @@ module Retriable
     random = opts[:random]? || settings.random
     multiplier = opts[:multiplier]? || settings.multiplier
     max_elapsed_time = opts[:max_elapsed_time]? || settings.max_elapsed_time
-    intervals = opts[:intervals]? || settings.intervals?
-    max_attempts = opts[:times]? || opts[:max_attempts]? || settings.max_attempts?
-    sleep_disabled = opts[:sleep_disabled]? || settings.sleep_disabled
+    intervals = opts[:intervals]? || settings.intervals
+    max_attempts = opts[:times]? || opts[:max_attempts]? || settings.max_attempts
+    sleep_disabled = opts[:sleep_disabled]? || settings.sleep_disabled?
     except = opts[:except]? || settings.except
     on = on || opts[:only]? || settings.on
-    on_retry = opts[:on_retry]? || settings.on_retry?
-    backoff = opts[:backoff]? || settings.backoff
+    on_retry = opts[:on_retry]? || settings.on_retry
+    backoff = opts[:backoff]? || settings.backoff?
 
     if backoff == false
       base_interval = 0.seconds
@@ -64,7 +70,7 @@ module Retriable
     when Enumerable(Time::Span)
       intervals_size = intervals.size + 1
       intervals = intervals.each
-      if max_attempts && !settings.max_attempts?
+      if max_attempts && !settings.max_attempts
         if max_attempts > intervals_size
           intervals = intervals.chain(backoff.intervals.skip(intervals_size))
         else

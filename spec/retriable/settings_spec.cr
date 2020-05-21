@@ -1,10 +1,10 @@
 require "../spec_helper"
 
 describe Retriable::Settings do
-  settings = Retriable::Settings
+  settings = Retriable::Settings.new
 
   it "sleep defaults to enabled" do
-    settings.sleep_disabled.should be_false
+    settings.sleep_disabled?.should be_false
   end
 
   it "max_attempts defaults to nil" do

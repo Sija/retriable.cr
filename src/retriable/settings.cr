@@ -1,31 +1,27 @@
-require "habitat"
-
 module Retriable
-  Habitat.create do
-    setting max_attempts : Int32?
-    setting except : Exception.class | Array(Exception.class) | Nil
-    setting on : Exception.class | Array(Exception.class) | Nil
-    setting on_retry : Proc(Exception, Int32, Time::Span, Time::Span, Nil)?
-    setting base_interval : Time::Span = 0.5.seconds
-    setting max_elapsed_time : Time::Span = 15.minutes
-    setting max_interval : Time::Span = 1.minute
-    setting multiplier : Float64 = 1.5
-    setting sleep_disabled : Bool = false
-    setting rand_factor : Float64 = 0.5
-    setting random : Random = Random::DEFAULT
-    setting intervals : Array(Time::Span)?
-    setting backoff : Bool = true
-  end
-
   class Settings
-    def self.on_retry=(block : (Exception, Int32, Time::Span, Time::Span) -> _)
-      @@on_retry = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, interval : Time::Span) do
+    property max_attempts : Int32?
+    property except : Exception.class | Array(Exception.class)?
+    property on : Exception.class | Array(Exception.class)?
+    property on_retry : Proc(Exception, Int32, Time::Span, Time::Span, Nil)?
+    property base_interval : Time::Span = 0.5.seconds
+    property max_elapsed_time : Time::Span = 15.minutes
+    property max_interval : Time::Span = 1.minute
+    property multiplier : Float64 = 1.5
+    property? sleep_disabled : Bool = false
+    property rand_factor : Float64 = 0.5
+    property random : Random = Random::DEFAULT
+    property intervals : Array(Time::Span)?
+    property? backoff : Bool = true
+
+    def on_retry=(block : (Exception, Int32, Time::Span, Time::Span) -> _)
+      @on_retry = ->(ex : Exception, attempt : Int32, elapsed_time : Time::Span, interval : Time::Span) do
         block.call(ex, attempt, elapsed_time, interval)
         nil
       end
     end
 
-    def self.on_retry(&block : (Exception, Int32, Time::Span, Time::Span) -> _)
+    def on_retry(&block : (Exception, Int32, Time::Span, Time::Span) -> _)
       self.on_retry = block
     end
   end
