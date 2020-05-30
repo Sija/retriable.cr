@@ -16,17 +16,19 @@ module Retriable
     def intervals : Iterator(Time::Span)
       should_randomize = randomize?
       (0..Int32::MAX).each.map do |iteration|
-        interval = {@base_interval * @multiplier**iteration, @max_interval}.min
-        should_randomize ? randomize(interval) : interval
+        interval = @multiplier**iteration
+        interval = randomize(interval) if should_randomize
+        {@base_interval * interval, @max_interval}.min
+      rescue OverflowError
+        @max_interval
       end
     end
 
-    protected def randomize(interval) : Time::Span
+    protected def randomize(interval) : Float64
       delta = interval * @rand_factor
       min = interval - delta
       max = interval + delta
-      randomized = random.rand(min.to_f..max.to_f)
-      randomized.seconds
+      random.rand(min.to_f..max.to_f)
     end
   end
 end

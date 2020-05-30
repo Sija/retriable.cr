@@ -93,4 +93,13 @@ describe Retriable::ExponentialBackoff do
       19.2216796875,
     ].map(&.seconds)
   end
+
+  it "always returns :max_interval for higher iteration numbers" do
+    subject.new(**opts)
+      .intervals
+      .skip(100)
+      .first(3)
+      .to_a
+      .should eq Array.new(3) { opts[:max_interval] }
+  end
 end
