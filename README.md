@@ -1,6 +1,7 @@
-# retriable.cr [![Build Status](https://travis-ci.org/Sija/retriable.cr.svg?branch=master)](https://travis-ci.org/Sija/retriable.cr) [![Releases](https://img.shields.io/github/release/Sija/retriable.cr.svg)](https://github.com/Sija/retriable.cr/releases) [![License](https://img.shields.io/github/license/Sija/retriable.cr.svg)](https://github.com/Sija/retriable.cr/blob/master/LICENSE)
+# retriable.cr [![Build Status](https://travis-ci.com/Sija/retriable.cr.svg?branch=master)](https://travis-ci.com/Sija/retriable.cr) [![Releases](https://img.shields.io/github/release/Sija/retriable.cr.svg)](https://github.com/Sija/retriable.cr/releases) [![License](https://img.shields.io/github/license/Sija/retriable.cr.svg)](https://github.com/Sija/retriable.cr/blob/master/LICENSE)
 
 Retriable is a simple DSL to retry failed code blocks with randomized [exponential backoff](https://en.wikipedia.org/wiki/Exponential_backoff) time intervals. This is especially useful when interacting external APIs, remote services, or file system calls.
+
 ## Installation
 
 Add this to your application's `shard.yml`:
@@ -30,7 +31,9 @@ end
 ```
 
 ### Defaults
+
 By default, `Retriable` will:
+
 * rescue any exception inherited from `Exception`
 * use randomized exponential backoff to calculate each succeeding try interval.
 
@@ -69,6 +72,7 @@ Here are the available options, in some vague order of relevance to most common 
 | **`random`**            | `Random::DEFAULT` | Object inheriting from `Random`, which provides an interface for random values generation, using a pseudo random number generator (PRNG). |
 
 #### Configuring which options to retry with :on/:except
+
 **`:on`** / **`:except`** Can take the form:
 
 - An `Exception` class (retry every exception of this type, including subclasses)
