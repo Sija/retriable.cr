@@ -62,12 +62,14 @@ module Retriable
     )
 
     case intervals
-    when Enumerable(Int::Primitive | Float64)
+    when Enumerable(Time::Span)
+      # ignore
+    when Enumerable
       intervals = intervals.map(&.seconds)
     end
 
     case intervals
-    when Enumerable(Time::Span)
+    in Enumerable(Time::Span)
       intervals_size = intervals.size + 1
       intervals = intervals.each
       if max_attempts && !settings.max_attempts
@@ -79,7 +81,7 @@ module Retriable
       else
         max_attempts = intervals_size
       end
-    when Nil
+    in Nil
       intervals = backoff.intervals
     end
 
@@ -121,15 +123,15 @@ module Retriable
   # ameba:disable Metrics/CyclomaticComplexity
   protected def matches_exception?(on : Nil | Exception.class | Regex | Proc | Enumerable, ex, *proc_args)
     case on
-    when Nil
+    in Nil
       true
-    when Exception.class
+    in Exception.class
       on >= ex.class
-    when Regex
+    in Regex
       on =~ ex.message
-    when Proc
+    in Proc
       on.call(ex, *proc_args)
-    when Hash
+    in Hash
       on.any? do |klass, value|
         next unless klass >= ex.class
         case value
@@ -144,7 +146,7 @@ module Retriable
           end
         end
       end
-    when Enumerable
+    in Enumerable
       on.any? do |matcher|
         case matcher
         when Exception.class, Proc
