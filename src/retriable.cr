@@ -120,7 +120,6 @@ module Retriable
     !matches_exception?(on, ex, *proc_args)
   end
 
-  # ameba:disable Metrics/CyclomaticComplexity
   protected def matches_exception?(on : Nil | Exception.class | Regex | Proc | Enumerable, ex, *proc_args)
     case on
     in Nil
