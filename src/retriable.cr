@@ -23,7 +23,7 @@ module Retriable
 
   class_getter settings : Settings { Settings.new }
 
-  def configure : Nil
+  def configure(&) : Nil
     yield settings
   end
 
@@ -32,7 +32,7 @@ module Retriable
   end
 
   # ameba:disable Metrics/CyclomaticComplexity
-  def retry(on = nil, **opts)
+  def retry(on = nil, **opts, &)
     base_interval = opts[:base_interval]? || settings.base_interval
     max_interval = opts[:max_interval]? || settings.max_interval
     rand_factor = opts[:rand_factor]? || settings.rand_factor
