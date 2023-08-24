@@ -1,5 +1,5 @@
 name: retriable
-version: 0.2.4
+version: 0.2.5
 
 authors:
   - Sijawusz Pur Rahnama <sija@sija.pl>
@@ -7,8 +7,8 @@ authors:
 development_dependencies:
   ameba:
     github: crystal-ameba/ameba
-    version: ~> 1.2.0
+    version: ~> 1.5
 
-crystal: ~> 1.6
+crystal: ~> 1.9
 
 license: MIT
