@@ -150,7 +150,7 @@ Retriable.retry(times: 5, base_interval: 1.second, multiplier: 1.0, rand_factor:
 end
 ```
 
-This works by starting at a 1 second `base_interval`. Setting the `multiplier` to 1.0 means each subsequent try will increase 1x, which is still `1.0` seconds, and then a `rand_factor` of 0.0 means that there's no randomization of that interval. (By default, it would randomize 0.5 seconds, which would mean normally the intervals would randomize between 0.75 and 1.25 seconds, but in this case `rand_factor` is basically being disabled.)
+This works by starting at a 1 second `base_interval`. Setting the `multiplier` to 1.0 means each subsequent try will increase 1x, which is still `1.0` seconds, and then a `rand_factor` of 0.0 means that there's no randomization of that interval. (By default, it would randomize 0.5 seconds, which would mean normally the intervals would randomize between 0.5 and 1.5 seconds, but in this case `rand_factor` is basically being disabled.)
 
 Same thing can be done by passing `backoff: false` option.
 
@@ -202,7 +202,7 @@ begin
     # some code
   end
 rescue ex
-  # run this if retriable ends up re-rasing the exception
+  # run this if retriable ends up re-raising the exception
 else
   # run this if retriable doesn't raise any exceptions
 ensure
